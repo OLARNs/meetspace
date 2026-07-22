@@ -1,0 +1,8 @@
+# เผื่อ git init ที่ root — กันไฟล์ generate/secret ของทั้งสองแพ็คเกจ
+node_modules/
+dist/
+.next/
+.env
+.env.local
+*.log
+.DS_Store

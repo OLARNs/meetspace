@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+enum ParticipantStatus {
+  INVITED
+  ACCEPTED
+  DECLINED
+}
+
+model User {
+  id             String               @id @default(uuid())
+  name           String
+  email          String               @unique
+  password       String
+  role           Role                 @default(USER)
+  bookings       Booking[]
+  participations BookingParticipant[]
+  createdAt      DateTime             @default(now())
+}
+
+model Room {
+  id        String    @id @default(uuid())
+  name      String
+  location  String
+  capacity  Int
+  equipment String[]
+  imageUrl  String?
+  isActive  Boolean   @default(true)
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+}
+
+model Booking {
+  id           String               @id @default(uuid())
+  room         Room                 @relation(fields: [roomId], references: [id])
+  roomId       String
+  user         User                 @relation(fields: [userId], references: [id])
+  userId       String
+  title        String
+  startTime    DateTime
+  endTime      DateTime
+  status       BookingStatus        @default(CONFIRMED)
+  participants BookingParticipant[]
+  createdAt    DateTime             @default(now())
+
+  @@index([roomId, startTime, endTime])
+}
+
+// ผู้เข้าร่วมประชุมที่ถูกเชิญเข้า booking หนึ่ง ๆ (คนละคนกับผู้จอง)
+model BookingParticipant {
+  id        String            @id @default(uuid())
+  booking   Booking           @relation(fields: [bookingId], references: [id])
+  bookingId String
+  user      User              @relation(fields: [userId], references: [id])
+  userId    String
+  status    ParticipantStatus @default(INVITED)
+  createdAt DateTime          @default(now())
+
+  @@unique([bookingId, userId]) // เชิญคนเดิมซ้ำใน booking เดียวกันไม่ได้
+}

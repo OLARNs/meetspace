@@ -1,0 +1,10 @@
+packages:
+  - '.'
+
+# อนุญาตให้แพ็คเกจเหล่านี้รัน build/postinstall script (pnpm บล็อกเป็นค่าเริ่มต้น)
+allowBuilds:
+  '@nestjs/core': true
+  '@prisma/client': true
+  '@prisma/engines': true
+  bcrypt: true
+  prisma: true

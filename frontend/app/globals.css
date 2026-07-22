@@ -1,0 +1,20 @@
+@import 'tailwindcss';
+
+/* โทนสีตาม UI Mockup v2 (ฟ้าเย็น #1E5FA8 บนน้ำเงินเข้ม #0E2440)
+   ประกาศใน @theme แล้ว Tailwind จะสร้าง utility ให้เอง เช่น bg-navy, text-muted */
+@theme {
+  --color-navy: #0e2440; /* nav, หัวข้อ */
+  --color-blue: #1e5fa8; /* ปุ่ม, ลิงก์ */
+  --color-blue-dark: #17497f; /* hover */
+  --color-sky: #8fbceb; /* ตัวอักษรรองบนพื้นเข้ม */
+  --color-mist: #eef3f9; /* พื้นหลังหน้า */
+  --color-ink: #16283c; /* ตัวอักษรหลัก */
+  --color-muted: #5a7089; /* ตัวอักษรรอง */
+  --color-line: #d8e3ef; /* เส้นขอบ */
+  --color-danger: #c2402f;
+  --color-danger-dark: #a33526;
+
+  /* ผูกฟอนต์จาก next/font (ตัวแปรถูกตั้งไว้ที่ <html> ใน layout.js) */
+  --font-display: var(--font-chakra); /* Chakra Petch: หัวข้อ/ปุ่ม */
+  --font-body: var(--font-anuphan); /* Anuphan: เนื้อหา */
+}

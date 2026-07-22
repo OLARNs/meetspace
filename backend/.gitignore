@@ -1,0 +1,17 @@
+# dependencies
+/node_modules
+
+# build output (สร้างใหม่ได้ด้วย pnpm run build)
+/dist
+
+# env — มีรหัส database/JWT secret ห้ามขึ้น git
+.env
+.env.local
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
