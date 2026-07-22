@@ -3,11 +3,15 @@
 Single Project ของ DevNest School (นักเรียน: โอฬาร ศักดิ์หริรักษ์)
 โปรเจคนี้ถูก scaffold ไว้แล้ว ให้พัฒนาต่อจากโครงนี้ **อย่าเปลี่ยน tech stack และอย่าเปลี่ยน schema โดยไม่ถาม**
 
-## Tech Stack (โรงเรียนบังคับ ห้ามเปลี่ยน)
-- Frontend: Next.js (App Router, JavaScript) — โฟลเดอร์ `frontend/` (port 3000)
+## Tech Stack (ตาม SRS ที่ส่งอาจารย์ — SRS ระบุแค่ "Next.js" ไม่ล็อกภาษา)
+- Frontend: Next.js (App Router, **TypeScript**) — โฟลเดอร์ `frontend/` (port 3000)
+  - แนว decoupled/BFF ตาม fakebuck: next-auth v5 ถือ access_token, RSC + Server Actions, `lib/api/` typed fetch layer, ไม่มี DB ฝั่ง web
 - Backend: NestJS + TypeScript — โฟลเดอร์ `backend/` (port 3001)
 - Database: PostgreSQL + Prisma ORM
 - Auth: JWT (passport-jwt) + bcrypt
+
+> หมายเหตุ: เดิม scaffold ใส่ "JavaScript ห้ามเปลี่ยน" ไว้ แต่ SRS จริงเขียนแค่ "Next.js"
+> จึงรื้อ frontend เป็น TypeScript ตาม fakebuck ได้ (เวอร์ชัน JS เดิมเก็บไว้ที่ branch `main`)
 
 ## เกณฑ์ที่ต้องผ่าน (จากข้อกำหนดโรงเรียน)
 1. Auth: Sign-up, Login, JWT, Protected Routes, มี 2 Roles (USER / ADMIN)
