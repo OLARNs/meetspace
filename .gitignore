@@ -6,3 +6,7 @@ dist/
 *.log
 .DS_Store
 *.tsbuildinfo
+
+# ไฟล์ตั้งค่า/คำสั่งของ Claude Code — เก็บไว้ในเครื่องเท่านั้น ไม่ขึ้น GitHub
+.claude/
+CLAUDE.md
