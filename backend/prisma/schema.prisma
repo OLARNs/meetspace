@@ -62,7 +62,6 @@ model Booking {
   @@index([roomId, startTime, endTime])
 }
 
-// ผู้เข้าร่วมประชุมที่ถูกเชิญเข้า booking หนึ่ง ๆ (คนละคนกับผู้จอง)
 model BookingParticipant {
   id        String            @id @default(uuid())
   booking   Booking           @relation(fields: [bookingId], references: [id])
@@ -72,5 +71,5 @@ model BookingParticipant {
   status    ParticipantStatus @default(INVITED)
   createdAt DateTime          @default(now())
 
-  @@unique([bookingId, userId]) // เชิญคนเดิมซ้ำใน booking เดียวกันไม่ได้
+  @@unique([bookingId, userId])
 }

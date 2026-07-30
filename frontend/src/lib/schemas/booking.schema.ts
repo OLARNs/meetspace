@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createBookingSchema = z.object({
   roomId: z.string().min(1),
-  title: z.string().min(1, 'กรุณากรอกหัวข้อการประชุม'),
+  title: z.string().min(1, 'Please enter a meeting title'),
   startTime: z.string().min(1),
   endTime: z.string().min(1),
 });

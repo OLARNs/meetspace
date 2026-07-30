@@ -10,7 +10,7 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     const exists = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (exists) throw new ConflictException('อีเมลนี้ถูกใช้แล้ว');
+    if (exists) throw new ConflictException('This email is already in use');
     const hash = await bcrypt.hash(dto.password, 10);
     const user = await this.prisma.user.create({
       data: { name: dto.name, email: dto.email, password: hash },
@@ -21,7 +21,7 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {
-      throw new UnauthorizedException('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+      throw new UnauthorizedException('Invalid email or password');
     }
     return this.sign(user);
   }

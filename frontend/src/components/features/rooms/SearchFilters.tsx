@@ -28,31 +28,31 @@ export default function SearchFilters({ defaults }: { defaults: { date: string; 
 
   return (
     <div className="mb-5 rounded-xl border border-line bg-white p-5 shadow-sm">
-      <h3 className="mb-4 text-lg font-bold text-navy">ค้นหาห้องว่าง</h3>
+      <h3 className="mb-4 text-lg font-bold text-navy">Search Available Rooms</h3>
       <div className="flex flex-wrap gap-3">
         <div className="min-w-52 flex-2">
-          <span className={label}>ชื่อห้องประชุม</span>
-          <input className={input} defaultValue={defaults.keyword} placeholder="เช่น Room A, Board Room..." onChange={(e) => pushDebounced({ keyword: e.target.value })} />
+          <span className={label}>Room Name</span>
+          <input className={input} defaultValue={defaults.keyword} placeholder="e.g. Room A, Board Room..." onChange={(e) => pushDebounced({ keyword: e.target.value })} />
         </div>
         <div className="min-w-24 flex-1">
-          <span className={label}>ที่นั่งขั้นต่ำ</span>
-          <input className={input} type="number" min="1" defaultValue={defaults.minCapacity} placeholder="ไม่ระบุ" onChange={(e) => pushDebounced({ minCapacity: e.target.value })} />
+          <span className={label}>Min. Capacity</span>
+          <input className={input} type="number" min="1" defaultValue={defaults.minCapacity} placeholder="Any" onChange={(e) => pushDebounced({ minCapacity: e.target.value })} />
         </div>
         <div className="min-w-35 flex-1">
-          <span className={label}>วันที่</span>
+          <span className={label}>Date</span>
           <input className={input} type="date" defaultValue={defaults.date} onChange={(e) => push({ date: e.target.value })} />
         </div>
         <div className="min-w-28 flex-1">
-          <span className={label}>เวลาเริ่ม</span>
+          <span className={label}>Start Time</span>
           <input className={input} type="time" defaultValue={defaults.start} onChange={(e) => push({ start: e.target.value })} />
         </div>
         <div className="min-w-28 flex-1">
-          <span className={label}>เวลาสิ้นสุด</span>
+          <span className={label}>End Time</span>
           <input className={input} type="time" defaultValue={defaults.end} onChange={(e) => push({ end: e.target.value })} />
         </div>
       </div>
       <p className="mt-3 text-sm text-muted">
-        เลือกวันและช่วงเวลาที่จะประชุม ผลด้านล่างอัพเดตทันที — ชื่อห้องกับที่นั่งเว้นว่างได้ (= เอาทุกห้อง)
+        Pick a date and time range for your meeting — results update instantly. Room name and capacity are optional (blank = all rooms)
       </p>
     </div>
   );

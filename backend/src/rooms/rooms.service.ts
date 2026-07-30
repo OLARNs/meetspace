@@ -39,7 +39,7 @@ export class RoomsService {
   /** ตารางการใช้ห้องของทุกห้องในวันที่ระบุ (ใช้วาด timeline หน้าแรก) */
   async schedule(date?: string) {
     const dayStart = date ? new Date(`${date}T00:00:00`) : new Date(new Date().setHours(0, 0, 0, 0));
-    if (isNaN(dayStart.getTime())) throw new BadRequestException('รูปแบบวันที่ไม่ถูกต้อง (YYYY-MM-DD)');
+    if (isNaN(dayStart.getTime())) throw new BadRequestException('Invalid date format (YYYY-MM-DD)');
     const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
     return this.prisma.room.findMany({
       where: { isActive: true },
@@ -67,7 +67,7 @@ export class RoomsService {
         },
       },
     });
-    if (!room) throw new NotFoundException('ไม่พบห้องประชุมนี้');
+    if (!room) throw new NotFoundException('Room not found');
     return room;
   }
 

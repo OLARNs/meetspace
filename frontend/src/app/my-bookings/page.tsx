@@ -18,15 +18,15 @@ export default async function MyBookingsPage() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-navy">การจองของฉัน</h1>
+      <h1 className="text-3xl font-bold text-navy">My Bookings</h1>
 
-      <SectionTitle>กำลังจะมาถึง</SectionTitle>
+      <SectionTitle>Upcoming</SectionTitle>
       {upcoming.map((b) => <MyBookingCard key={b.id} booking={b} editable />)}
-      {!upcoming.length && <p className="text-sm text-muted">ยังไม่มีการจองที่กำลังจะมาถึง</p>}
+      {!upcoming.length && <p className="text-sm text-muted">No upcoming bookings</p>}
 
-      <SectionTitle>ประวัติ</SectionTitle>
+      <SectionTitle>History</SectionTitle>
       {history.map((b) => <MyBookingCard key={b.id} booking={b} editable={false} />)}
-      {!history.length && <p className="text-sm text-muted">ยังไม่มีประวัติการจอง</p>}
+      {!history.length && <p className="text-sm text-muted">No booking history</p>}
     </>
   );
 }

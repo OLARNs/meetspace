@@ -57,22 +57,22 @@ export default async function HomePage({ searchParams }: { searchParams: SP }) {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-navy">จองห้องประชุม</h1>
-      <p className="mt-1 mb-5 text-muted">ค้นหาและจองห้องประชุมที่ว่างสำหรับทีมของคุณ</p>
+      <h1 className="text-3xl font-bold text-navy">Book a Meeting Room</h1>
+      <p className="mt-1 mb-5 text-muted">Find and book an available meeting room for your team</p>
 
       <SearchFilters defaults={{ date, keyword, minCapacity, start: startTime, end: endTime }} />
 
       <div className="mb-6">
-        <p className="mb-2 text-sm text-muted">{new Date(`${date}T00:00:00`).toLocaleDateString('th-TH', { dateStyle: 'long' })}</p>
+        <p className="mb-2 text-sm text-muted">{new Date(`${date}T00:00:00`).toLocaleDateString('en-US', { dateStyle: 'long' })}</p>
         <RoomTimeline rooms={visibleSchedule} meId={meId} date={date} slot={slot} />
       </div>
 
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-lg font-bold text-navy">ห้องประชุมทั้งหมด</h3>
+        <h3 className="text-lg font-bold text-navy">All Meeting Rooms</h3>
         {hasSlot ? (
-          <span className="text-sm text-muted">ว่าง {freeCount} จาก {rooms.length} ห้อง · ช่วง {startTime}–{endTime} น.</span>
+          <span className="text-sm text-muted">{freeCount} of {rooms.length} rooms available · {startTime}–{endTime}</span>
         ) : (
-          <span className="text-sm text-muted">เลือกเวลาเริ่ม–สิ้นสุดด้านบน เพื่อเช็คว่าห้องไหนว่าง</span>
+          <span className="text-sm text-muted">Select a start–end time above to check room availability</span>
         )}
       </div>
 
@@ -80,7 +80,7 @@ export default async function HomePage({ searchParams }: { searchParams: SP }) {
         {rooms.map((r) => {
           const free = isFree(r);
           return (
-            <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm" key={r.id}>
+            <div className="flex h-full flex-col overflow-hidden rounded-xl border border-line bg-white shadow-sm" key={r.id}>
               <div className="flex items-start justify-between gap-2 bg-navy p-4">
                 <div>
                   <p className="text-[11px] font-medium tracking-widest text-slate-400 uppercase">{r.location}</p>
@@ -89,21 +89,21 @@ export default async function HomePage({ searchParams }: { searchParams: SP }) {
                 {free !== null && (
                   <span className={`flex items-center gap-1.5 text-sm ${free ? 'text-teal-300' : 'text-rose-400'}`}>
                     <span className={`h-2 w-2 rounded-full ${free ? 'bg-teal-300' : 'bg-rose-400'}`} />
-                    {free ? 'ว่าง' : 'ไม่ว่าง'}
+                    {free ? 'Available' : 'Busy'}
                   </span>
                 )}
               </div>
-              <div className="p-4">
-                <p className="mb-3 text-sm text-muted">👥 {r.capacity} ที่นั่ง · {(r.equipment || []).join(' · ')}</p>
-                <Link className="block rounded-lg bg-blue px-4 py-2.5 text-center font-medium text-white hover:bg-blue-dark" href={`/rooms/${r.id}${slotQuery}`}>
-                  รายละเอียด / จอง
+              <div className="flex flex-1 flex-col p-4">
+                <p className="mb-3 text-sm text-muted">👥 {r.capacity} seats · {(r.equipment || []).join(' · ')}</p>
+                <Link className="mt-auto block rounded-lg bg-blue px-4 py-2.5 text-center font-medium text-white hover:bg-blue-dark" href={`/rooms/${r.id}${slotQuery}`}>
+                  Details / Book
                 </Link>
               </div>
             </div>
           );
         })}
       </div>
-      {!rooms.length && <p className="text-sm text-muted">ไม่พบห้องที่ตรงกับตัวกรอง</p>}
+      {!rooms.length && <p className="text-sm text-muted">No rooms match the current filters</p>}
     </>
   );
 }

@@ -1,19 +1,19 @@
 import { z } from 'zod';
 
 export const loginSchema = z.object({
-  email: z.email('อีเมลไม่ถูกต้อง'),
-  password: z.string().min(1, 'กรุณากรอกรหัสผ่าน'),
+  email: z.email('Invalid email address'),
+  password: z.string().min(1, 'Please enter your password'),
 });
 
 export const registerSchema = z
   .object({
-    name: z.string().min(1, 'กรุณากรอกชื่อ'),
-    email: z.email('อีเมลไม่ถูกต้อง'),
-    password: z.string().min(8, 'รหัสผ่านอย่างน้อย 8 ตัวอักษร'),
+    name: z.string().min(1, 'Please enter your name'),
+    email: z.email('Invalid email address'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
     confirm: z.string(),
   })
   .refine((v) => v.password === v.confirm, {
-    message: 'รหัสผ่านทั้งสองช่องไม่ตรงกัน',
+    message: 'Passwords do not match',
     path: ['confirm'],
   });
 

@@ -40,33 +40,33 @@ export default async function AdminPage() {
   return (
     <>
       <h1 className="flex items-center gap-3 text-3xl font-bold text-navy">
-        จัดการระบบ
+        Admin Dashboard
         <span className="rounded-full bg-navy px-3 py-1 text-xs font-semibold tracking-widest text-teal-200">ADMIN</span>
       </h1>
 
       <div className="mt-5 mb-5 grid gap-4 sm:grid-cols-3">
-        <StatCard icon="🏢" value={activeRooms.length} unit="ห้องที่เปิดใช้งาน" color="text-blue" />
-        <StatCard icon="📅" value={weekBookings.length} unit="การจองสัปดาห์นี้" color="text-violet-600" />
-        <StatCard icon="📊" value={`${utilization}%`} unit="อัตราการใช้ห้อง" color="text-emerald-600" />
+        <StatCard icon="🏢" value={activeRooms.length} unit="Active rooms" color="text-blue" />
+        <StatCard icon="📅" value={weekBookings.length} unit="Bookings this week" color="text-violet-600" />
+        <StatCard icon="📊" value={`${utilization}%`} unit="Utilization rate" color="text-emerald-600" />
       </div>
 
       <div className="mb-5 rounded-xl border border-line bg-white p-5 shadow-sm">
-        <h3 className="mb-4 text-lg font-bold text-navy">เพิ่มห้องประชุม</h3>
+        <h3 className="mb-4 text-lg font-bold text-navy">Add Meeting Room</h3>
         <AddRoomForm />
       </div>
 
       <div className="mb-5 rounded-xl border border-line bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-baseline justify-between">
-          <h3 className="text-lg font-bold text-navy">ห้องประชุมทั้งหมด</h3>
-          <span className="text-sm text-muted">{rooms.length} รายการ</span>
+          <h3 className="text-lg font-bold text-navy">All Meeting Rooms</h3>
+          <span className="text-sm text-muted">{rooms.length} items</span>
         </div>
         <RoomsTable rooms={rooms} />
       </div>
 
       <div className="mb-5 rounded-xl border border-line bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-baseline justify-between">
-          <h3 className="text-lg font-bold text-navy">การจองทั้งหมด</h3>
-          <span className="text-sm text-muted">{bookings.length} รายการ</span>
+          <h3 className="text-lg font-bold text-navy">All Bookings</h3>
+          <span className="text-sm text-muted">{bookings.length} items</span>
         </div>
         <BookingsTable bookings={bookings} />
       </div>

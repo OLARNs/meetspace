@@ -7,16 +7,16 @@ export default async function AccountPage() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-navy">บัญชีของฉัน</h1>
-      <p className="mt-1 mb-5 text-muted">แก้ไขชื่อและเปลี่ยนรหัสผ่านของบัญชี</p>
+      <h1 className="text-3xl font-bold text-navy">My Account</h1>
+      <p className="mt-1 mb-5 text-muted">Edit your name and change your account password</p>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="self-start rounded-xl border border-line bg-white p-5 shadow-sm">
-          <h3 className="mb-4 text-lg font-bold text-navy">ข้อมูลส่วนตัว</h3>
+          <h3 className="mb-4 text-lg font-bold text-navy">Profile</h3>
           <ProfileForm defaultName={me.name} email={me.email} />
         </div>
         <div className="self-start rounded-xl border border-line bg-white p-5 shadow-sm">
-          <h3 className="mb-4 text-lg font-bold text-navy">เปลี่ยนรหัสผ่าน</h3>
+          <h3 className="mb-4 text-lg font-bold text-navy">Change Password</h3>
           <PasswordForm />
         </div>
       </div>

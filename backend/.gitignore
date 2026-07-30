@@ -6,7 +6,6 @@
 
 # env — มีรหัส database/JWT secret ห้ามขึ้น git
 .env
-.env.local
 
 # logs
 *.log

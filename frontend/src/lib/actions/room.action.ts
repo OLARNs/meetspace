@@ -21,7 +21,7 @@ export async function createRoomAction(input: CreateRoomInput): Promise<ActionRe
   }
   revalidatePath('/admin');
   revalidatePath('/');
-  return { success: true, message: 'เพิ่มห้องแล้ว' };
+  return { success: true, message: 'Room added' };
 }
 
 export async function updateRoomAction(input: UpdateRoomInput): Promise<ActionResult> {
@@ -36,7 +36,7 @@ export async function updateRoomAction(input: UpdateRoomInput): Promise<ActionRe
   }
   revalidatePath('/admin');
   revalidatePath('/');
-  return { success: true, message: 'แก้ไขห้องแล้ว' };
+  return { success: true, message: 'Room updated' };
 }
 
 // เปิด/ปิดใช้งานห้อง: ปิด = soft delete (DELETE), เปิดคืน = PATCH isActive=true

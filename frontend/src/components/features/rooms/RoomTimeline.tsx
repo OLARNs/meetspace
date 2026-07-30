@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import type { ScheduleRoom } from '@/lib/api/api.type';
 
 // ตาราง timeline การใช้ห้องรายวัน (08:00–18:00)
@@ -25,13 +26,19 @@ type Props = {
 };
 
 export default function RoomTimeline({ rooms, meId, date, slot }: Props) {
-  const now = new Date();
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  const isToday = date === today;
-  const isPastDay = date < today;
+  // now เริ่มที่ null ทั้ง server และ client รอบแรก (ค่าตรงกันเสมอ) แล้วค่อยเซ็ตค่าจริงหลัง mount
+  // เพื่อกัน hydration mismatch จาก new Date() ที่ต่างเวลากันระหว่าง server render กับ client hydrate
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+  }, []);
 
-  const nowHour = now.getHours() + now.getMinutes() / 60;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const today = now ? `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}` : '';
+  const isToday = now !== null && date === today;
+  const isPastDay = now !== null && date < today;
+
+  const nowHour = now ? now.getHours() + now.getMinutes() / 60 : 0;
   const showNowLine = isToday && nowHour >= START && nowHour <= END;
   const nowLeft = ((nowHour - START) / (END - START)) * 100;
 
@@ -55,13 +62,13 @@ export default function RoomTimeline({ rooms, meId, date, slot }: Props) {
   return (
     <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <h3 className="mr-auto text-lg font-bold text-navy">ตารางการใช้ห้อง</h3>
-        <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded border border-line bg-white" /> ว่าง</span>
-        <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded bg-rose-500" /> จองแล้ว</span>
-        <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded bg-amber-400" /> ของคุณ</span>
-        {passedWidth > 0 && <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded bg-slate-300/60" /> ผ่านไปแล้ว</span>}
-        {band && <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded border border-blue/50 bg-blue/15" /> ช่วงที่เลือก</span>}
-        {showNowLine && <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-0.5 rounded bg-blue" /> ตอนนี้ ({pad(now.getHours())}:{pad(now.getMinutes())})</span>}
+        <h3 className="mr-auto text-lg font-bold text-navy">Room Usage Schedule</h3>
+        <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded border border-line bg-white" /> Available</span>
+        <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded bg-rose-500" /> Booked</span>
+        <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded bg-amber-400" /> Yours</span>
+        {passedWidth > 0 && <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded bg-slate-300/60" /> Past</span>}
+        {band && <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-3 rounded border border-blue/50 bg-blue/15" /> Selected range</span>}
+        {showNowLine && now && <span className="flex items-center gap-1.5 text-xs text-muted"><span className="h-3 w-0.5 rounded bg-blue" /> Now ({pad(now.getHours())}:{pad(now.getMinutes())})</span>}
       </div>
 
       <div className="overflow-x-auto">
@@ -80,7 +87,7 @@ export default function RoomTimeline({ rooms, meId, date, slot }: Props) {
                 <div className="grid h-full grid-cols-10">
                   {HOURS.map((h) => (
                     <div className="flex items-center justify-center border border-dashed border-line" key={h}>
-                      {!cellPassed(h) && <span className="text-[10px] text-slate-300">ว่าง</span>}
+                      {!cellPassed(h) && <span className="text-[10px] text-slate-300">Free</span>}
                     </div>
                   ))}
                 </div>
@@ -98,7 +105,7 @@ export default function RoomTimeline({ rooms, meId, date, slot }: Props) {
                       key={b.id}
                     >
                       <span className={`truncate text-xs font-medium ${mine ? 'text-amber-950' : 'text-white'}`}>
-                        {mine ? `ของคุณ · ${b.title}` : b.title}
+                        {mine ? `Yours · ${b.title}` : b.title}
                       </span>
                     </div>
                   );
@@ -108,7 +115,7 @@ export default function RoomTimeline({ rooms, meId, date, slot }: Props) {
             </div>
           ))}
 
-          {!rooms.length && <p className="mt-3 text-sm text-muted">ไม่มีข้อมูลห้อง</p>}
+          {!rooms.length && <p className="mt-3 text-sm text-muted">No room data available</p>}
         </div>
       </div>
     </div>

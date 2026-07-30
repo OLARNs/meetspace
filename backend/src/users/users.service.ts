@@ -12,7 +12,7 @@ export class UsersService {
 
   async me(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId }, select: SAFE_SELECT });
-    if (!user) throw new NotFoundException('ไม่พบผู้ใช้นี้');
+    if (!user) throw new NotFoundException('User not found');
     return user;
   }
 
@@ -24,12 +24,12 @@ export class UsersService {
     // เปลี่ยนรหัสผ่านเป็นเรื่องแยก: ต้องยืนยันตัวตนด้วยรหัสเดิมก่อนเสมอ
     if (dto.newPassword) {
       if (!dto.currentPassword) {
-        throw new BadRequestException('กรุณากรอกรหัสผ่านเดิมเพื่อยืนยันการเปลี่ยนรหัสผ่าน');
+        throw new BadRequestException('Current password is required to change your password');
       }
       const user = await this.prisma.user.findUnique({ where: { id: userId } });
-      if (!user) throw new NotFoundException('ไม่พบผู้ใช้นี้');
+      if (!user) throw new NotFoundException('User not found');
       const match = await bcrypt.compare(dto.currentPassword, user.password);
-      if (!match) throw new UnauthorizedException('รหัสผ่านเดิมไม่ถูกต้อง');
+      if (!match) throw new UnauthorizedException('Current password is incorrect');
       data.password = await bcrypt.hash(dto.newPassword, 10);
     }
 

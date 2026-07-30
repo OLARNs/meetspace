@@ -23,7 +23,7 @@ export async function updateNameAction(input: UpdateNameInput): Promise<ActionRe
     throw error;
   }
   revalidatePath('/account');
-  return { success: true, message: 'บันทึกชื่อแล้ว' };
+  return { success: true, message: 'Name saved' };
 }
 
 export async function changePasswordAction(input: ChangePasswordInput): Promise<ActionResult> {
@@ -38,5 +38,5 @@ export async function changePasswordAction(input: ChangePasswordInput): Promise<
     if (error instanceof ApiError) return { success: false, message: error.message };
     throw error;
   }
-  return { success: true, message: 'เปลี่ยนรหัสผ่านแล้ว' };
+  return { success: true, message: 'Password changed' };
 }

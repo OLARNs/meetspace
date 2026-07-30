@@ -1,4 +1,10 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/* ล็อก dark mode ให้ทำงานเฉพาะเมื่อมี .dark เท่านั้น (ไม่มีวันเกิดในโปรเจกต์นี้)
+   กัน utility dark: ที่ติดมากับ component ของ shadcn ไม่ให้ trigger ตาม prefers-color-scheme ของ OS */
+@custom-variant dark (&:is(.dark *));
 
 /* โทนสีตาม UI Mockup v2 (ฟ้าเย็น #1E5FA8 บนน้ำเงินเข้ม #0E2440)
    ประกาศใน @theme แล้ว Tailwind จะสร้าง utility ให้เอง เช่น bg-navy, text-muted */
@@ -14,7 +20,76 @@
   --color-danger: #c2402f;
   --color-danger-dark: #a33526;
 
-  /* ผูกฟอนต์จาก next/font (ตัวแปรถูกตั้งไว้ที่ <html> ใน layout.js) */
+  /* ผูกฟอนต์จาก next/font (ตัวแปรถูกตั้งไว้ที่ <html> ใน layout.tsx) */
   --font-display: var(--font-chakra); /* Chakra Petch: หัวข้อ/ปุ่ม */
   --font-body: var(--font-anuphan); /* Anuphan: เนื้อหา */
+}
+
+/* bridge: ผูก utility ของ shadcn (bg-primary, text-muted-foreground ฯลฯ)
+   เข้ากับตัวแปร semantic ที่ประกาศใน :root ด้านล่าง + ผูก font-sans/heading เข้าฟอนต์แบรนด์ */
+@theme inline {
+  --font-sans: var(--font-anuphan);
+  --font-heading: var(--font-chakra);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  /* ไม่ bridge --color-muted ให้ shadcn: แบรนด์ใช้ text-muted = #5a7089 (ตัวอักษรรอง) อยู่แล้ว
+     ถ้า bridge ทับจะกลายเป็นสี mist (ขาวจาง) อ่านไม่ออก จึงปล่อยให้ค่าแบรนด์ชนะ
+     พื้นหลังโทนอ่อนของ shadcn ใช้ผ่าน bg-accent (= mist) แทน bg-muted */
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+/* semantic token ของ shadcn — map กลับไปที่สีแบรนด์ ให้ component หยิบสีแบรนด์อัตโนมัติ
+   (light mode อย่างเดียว — โปรเจกต์นี้ไม่มี dark mode) */
+:root {
+  --radius: 0.5rem; /* = rounded-lg ของเดิม */
+
+  --background: var(--color-mist);
+  --foreground: var(--color-ink);
+  --card: #ffffff;
+  --card-foreground: var(--color-ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-blue);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-mist);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-mist);
+  --muted-foreground: var(--color-muted);
+  --accent: var(--color-mist);
+  --accent-foreground: var(--color-ink);
+  --destructive: var(--color-danger);
+  --destructive-foreground: #ffffff;
+  --border: var(--color-line);
+  --input: var(--color-line);
+  --ring: var(--color-blue);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
 }

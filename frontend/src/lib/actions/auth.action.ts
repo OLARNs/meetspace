@@ -13,7 +13,7 @@ export async function loginAction(input: LoginInput): Promise<ActionResult> {
     // redirect:false เพื่อให้ client จัดการ navigate เอง (จะได้ refresh nav ด้วย)
     await signIn('credentials', { ...parsed.data, redirect: false });
   } catch (error) {
-    if (error instanceof AuthError) return { success: false, message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' };
+    if (error instanceof AuthError) return { success: false, message: 'Invalid email or password' };
     throw error;
   }
   return { success: true };
@@ -33,7 +33,7 @@ export async function registerAction(input: RegisterInput): Promise<ActionResult
     await signIn('credentials', { email, password, redirect: false });
   } catch (error) {
     if (error instanceof ApiError) return { success: false, message: error.message };
-    if (error instanceof AuthError) return { success: false, message: 'สมัครสำเร็จ แต่เข้าสู่ระบบอัตโนมัติไม่ได้ ลองล็อกอินอีกครั้ง' };
+    if (error instanceof AuthError) return { success: false, message: 'Registered successfully, but automatic login failed. Please try logging in again.' };
     throw error;
   }
   return { success: true };

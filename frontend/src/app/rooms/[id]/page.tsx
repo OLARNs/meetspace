@@ -35,27 +35,27 @@ export default async function RoomDetailPage({ params, searchParams }: Props) {
     endTime: one(searchParams.end),
   };
 
-  const fmtDate = (d: string) => new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
-  const fmtTime = (d: string) => new Date(d).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+  const fmtDate = (d: string) => new Date(d).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+  const fmtTime = (d: string) => new Date(d).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
   return (
     <>
-      <p className="mb-4"><Link className="text-sm text-muted hover:text-ink" href="/">← กลับไปหน้าค้นหา</Link></p>
+      <p className="mb-4"><Link className="text-sm text-muted hover:text-ink" href="/">← Back to search</Link></p>
       <h1 className="text-3xl font-bold text-navy">{room.name}</h1>
-      <p className="mt-1 mb-5 text-muted">{room.location} · {room.capacity} ที่นั่ง · {(room.equipment || []).join(', ')}</p>
+      <p className="mt-1 mb-5 text-muted">{room.location} · {room.capacity} seats · {(room.equipment || []).join(', ')}</p>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="self-start rounded-xl border border-line bg-white p-5 shadow-sm">
-          <h3 className="mb-4 text-lg font-bold text-navy">จองห้องประชุม</h3>
+          <h3 className="mb-4 text-lg font-bold text-navy">Book This Room</h3>
           <BookingForm roomId={room.id} defaults={defaults} />
         </div>
 
         <div className="self-start rounded-xl border border-line bg-white p-5 shadow-sm">
-          <h3 className="mb-4 text-lg font-bold text-navy">ตารางการจองที่กำลังจะมาถึง</h3>
+          <h3 className="mb-4 text-lg font-bold text-navy">Upcoming Bookings</h3>
           {room.bookings?.length ? (
             <table className="w-full border-collapse">
               <thead>
-                <tr><th className={th}>เวลา</th><th className={th}>หัวข้อ</th><th className={th}>ผู้จอง</th></tr>
+                <tr><th className={th}>Time</th><th className={th}>Title</th><th className={th}>Booked by</th></tr>
               </thead>
               <tbody>
                 {room.bookings.map((b) => (
@@ -67,9 +67,9 @@ export default async function RoomDetailPage({ params, searchParams }: Props) {
                 ))}
               </tbody>
             </table>
-          ) : <p className="text-sm text-muted">ยังไม่มีการจอง</p>}
+          ) : <p className="text-sm text-muted">No bookings yet</p>}
           <div className="mt-4 rounded-lg border border-line bg-mist p-3 text-sm text-muted">
-            💡 เลือกช่วงเวลาที่ว่างจากตาราง แล้วกรอกฟอร์มด้านซ้ายเพื่อทำการจอง
+            💡 Pick an available time slot from the table, then fill in the form on the left to book
           </div>
         </div>
       </div>

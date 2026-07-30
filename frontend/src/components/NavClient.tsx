@@ -1,8 +1,10 @@
 'use client';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { Role } from '@/lib/api/api.type';
 import { logoutAction } from '@/lib/actions/auth.action';
+import { Button } from '@/components/ui/button';
 
 type Props = { user: { name: string; role: Role } | null };
 
@@ -15,26 +17,31 @@ export default function NavClient({ user }: Props) {
 
   return (
     <nav className="flex flex-wrap items-center gap-2 bg-navy px-6 py-3 text-white">
-      <Link className="mr-5 font-display text-xl font-bold tracking-wide" href="/">
+      <Link className="mr-5 flex items-center gap-2 font-display text-xl font-bold tracking-wide" href="/">
+        <Image src="/logo.png" alt="MeetSpace" width={48} height={32} className="h-8 w-auto object-contain" priority />
         MeetSpace
-        <span className="ml-1.5 inline-block h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_2px_rgba(52,211,153,.55)]" />
       </Link>
-      <Link className={navLink(pathname === '/')} href="/">ค้นหาห้อง</Link>
-      {user && <Link className={navLink(pathname === '/my-bookings')} href="/my-bookings">การจองของฉัน</Link>}
-      {user && <Link className={navLink(pathname === '/account')} href="/account">บัญชีของฉัน</Link>}
+      <Link className={navLink(pathname === '/')} href="/">Search Rooms</Link>
+      {user && <Link className={navLink(pathname === '/my-bookings')} href="/my-bookings">My Bookings</Link>}
+      {user && <Link className={navLink(pathname === '/account')} href="/account">My Account</Link>}
       <span className="mr-auto" />
       {/* เมนูผู้ดูแลระบบเห็นเฉพาะ role ADMIN */}
-      {user?.role === 'ADMIN' && <Link className={navLink(pathname === '/admin')} href="/admin">ผู้ดูแลระบบ</Link>}
+      {user?.role === 'ADMIN' && <Link className={navLink(pathname === '/admin')} href="/admin">Admin</Link>}
       {user ? (
         <form action={logoutAction}>
-          <button className="cursor-pointer rounded-lg border border-white/25 px-4 py-1.5 text-sm text-slate-200 hover:bg-white/10" type="submit">
-            ออกจากระบบ · {user.name}
-          </button>
+          <Button
+            type="submit"
+            variant="outline"
+            size="sm"
+            className="border-white/25 bg-transparent text-slate-200 hover:bg-white/10 hover:text-white"
+          >
+            Sign out · {user.name}
+          </Button>
         </form>
       ) : (
-        <Link className="rounded-lg bg-blue px-4 py-2 text-sm font-medium text-white hover:bg-blue-dark" href="/login">
-          เข้าสู่ระบบ
-        </Link>
+        <Button asChild className="h-9 hover:bg-blue-dark">
+          <Link href="/login">Sign In</Link>
+        </Button>
       )}
     </nav>
   );

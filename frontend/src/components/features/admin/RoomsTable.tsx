@@ -3,11 +3,30 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Room } from '@/lib/api/api.type';
 import { updateRoomAction, setRoomActiveAction } from '@/lib/actions/room.action';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
-const input = 'w-full rounded-lg border border-line bg-white p-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue';
-const th = 'border-b border-line bg-mist p-2.5 text-left text-sm font-semibold text-muted';
-const td = 'border-b border-line p-2.5 text-sm';
-const btn = 'cursor-pointer rounded-lg border px-3 py-1.5 text-sm font-medium disabled:opacity-60';
+const th = 'bg-mist font-semibold text-muted';
 
 export default function RoomsTable({ rooms }: { rooms: Room[] }) {
   const router = useRouter();
@@ -28,11 +47,10 @@ export default function RoomsTable({ rooms }: { rooms: Room[] }) {
   }
 
   function toggle(room: Room) {
-    const ask = room.isActive ? 'ปิดการใช้งานห้องนี้?' : 'เปิดใช้งานห้องนี้อีกครั้ง?';
-    if (!confirm(ask)) return;
+    setError('');
     startTransition(async () => {
       const res = await setRoomActiveAction(room.id, !room.isActive);
-      if (!res.success) return alert(res.message);
+      if (!res.success) return setError(res.message);
       router.refresh();
     });
   }
@@ -40,47 +58,71 @@ export default function RoomsTable({ rooms }: { rooms: Room[] }) {
   return (
     <div className="overflow-x-auto">
       {error && <p className="mb-2 text-sm text-danger">{error}</p>}
-      <table className="w-full border-collapse">
-        <thead>
-          <tr><th className={th}>ชื่อ</th><th className={th}>สถานที่</th><th className={th}>ที่นั่ง</th><th className={th}>สถานะ</th><th className={th}>การจัดการ</th></tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className={th}>Name</TableHead>
+            <TableHead className={th}>Location</TableHead>
+            <TableHead className={th}>Capacity</TableHead>
+            <TableHead className={th}>Status</TableHead>
+            <TableHead className={th}>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {rooms.map((r) =>
             edit?.id === r.id ? (
-              <tr key={r.id}>
-                <td className={td}><input className={input} value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} /></td>
-                <td className={td}><input className={input} value={edit.location} onChange={(e) => setEdit({ ...edit, location: e.target.value })} /></td>
-                <td className={td}><input className={input} type="number" min="1" value={edit.capacity} onChange={(e) => setEdit({ ...edit, capacity: e.target.value })} /></td>
-                <td className={td} colSpan={2}>
+              <TableRow key={r.id}>
+                <TableCell><Input className="h-9" value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} /></TableCell>
+                <TableCell><Input className="h-9" value={edit.location} onChange={(e) => setEdit({ ...edit, location: e.target.value })} /></TableCell>
+                <TableCell><Input className="h-9" type="number" min="1" value={edit.capacity} onChange={(e) => setEdit({ ...edit, capacity: e.target.value })} /></TableCell>
+                <TableCell colSpan={2}>
                   <span className="flex gap-2">
-                    <button className="cursor-pointer rounded-lg bg-blue px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-dark disabled:opacity-60" onClick={save} disabled={pending}>บันทึก</button>
-                    <button className={`${btn} border-line text-muted hover:bg-mist`} onClick={() => setEdit(null)}>ยกเลิก</button>
+                    <Button size="sm" onClick={save} disabled={pending}>Save</Button>
+                    <Button variant="outline" size="sm" onClick={() => setEdit(null)}>Cancel</Button>
                   </span>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
-              <tr className={r.isActive ? '' : 'opacity-60'} key={r.id}>
-                <td className={`${td} font-medium`}>{r.name}</td>
-                <td className={`${td} text-muted`}>{r.location}</td>
-                <td className={td}>{r.capacity}</td>
-                <td className={td}>
+              <TableRow className={r.isActive ? '' : 'opacity-60'} key={r.id}>
+                <TableCell className="font-medium">{r.name}</TableCell>
+                <TableCell className="text-muted">{r.location}</TableCell>
+                <TableCell>{r.capacity}</TableCell>
+                <TableCell>
                   {r.isActive
-                    ? <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">เปิดใช้งาน</span>
-                    : <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-medium text-rose-600">ปิดใช้งาน</span>}
-                </td>
-                <td className={td}>
+                    ? <Badge variant="success">Active</Badge>
+                    : <Badge variant="cancelled">Inactive</Badge>}
+                </TableCell>
+                <TableCell>
                   <span className="flex gap-2">
-                    <button className={`${btn} border-blue text-blue hover:bg-blue hover:text-white`} onClick={() => setEdit({ id: r.id, name: r.name, location: r.location, capacity: String(r.capacity) })}>แก้ไข</button>
-                    {r.isActive
-                      ? <button className={`${btn} border-line text-muted hover:bg-mist`} onClick={() => toggle(r)} disabled={pending}>ปิดใช้งาน</button>
-                      : <button className={`${btn} border-emerald-300 text-emerald-700 hover:bg-emerald-50`} onClick={() => toggle(r)} disabled={pending}>เปิดใช้งาน</button>}
+                    <Button variant="outline" size="sm" className="border-blue text-blue hover:bg-blue hover:text-white" onClick={() => setEdit({ id: r.id, name: r.name, location: r.location, capacity: String(r.capacity) })}>Edit</Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        {r.isActive
+                          ? <Button variant="outline" size="sm" className="border-rose-300 text-rose-600 hover:bg-rose-50 hover:text-rose-600" disabled={pending}>Deactivate</Button>
+                          : <Button variant="outline" size="sm" className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-700" disabled={pending}>Activate</Button>}
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{r.isActive ? 'ปิดการใช้งานห้องนี้?' : 'เปิดใช้งานห้องนี้อีกครั้ง?'}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {r.isActive
+                              ? 'ห้องจะถูกซ่อนจากการค้นหาและจองใหม่ไม่ได้ แต่ประวัติการจองเดิมยังอยู่ครบ'
+                              : 'ห้องจะกลับมาแสดงในการค้นหาและเปิดให้จองได้อีกครั้ง'}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => toggle(r)}>ยืนยัน</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </span>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

@@ -22,7 +22,7 @@ export async function createBookingAction(input: CreateBookingInput): Promise<Ac
   revalidatePath('/');
   revalidatePath(`/rooms/${parsed.data.roomId}`);
   revalidatePath('/my-bookings');
-  return { success: true, message: 'จองสำเร็จ!' };
+  return { success: true, message: 'Booking successful!' };
 }
 
 export async function updateBookingAction(input: UpdateBookingInput): Promise<ActionResult> {
@@ -37,7 +37,7 @@ export async function updateBookingAction(input: UpdateBookingInput): Promise<Ac
   }
   revalidatePath('/my-bookings');
   revalidatePath('/');
-  return { success: true, message: 'แก้ไขการจองแล้ว' };
+  return { success: true, message: 'Booking updated' };
 }
 
 export async function cancelBookingAction(id: string): Promise<ActionResult> {

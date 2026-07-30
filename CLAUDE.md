@@ -19,12 +19,16 @@ Single Project ของ DevNest School (นักเรียน: โอฬา�
 3. Core Features อย่างน้อย 2 อย่าง (ไม่นับ Auth) → (a) จอง/ยกเลิกห้อง + กันจองซ้อน (b) Search/Filter ห้องว่าง
 
 ## โครงสร้างสำคัญ
-- `backend/prisma/schema.prisma` — models: User, Room, Booking (+ enums Role, BookingStatus)
-- `backend/src/auth/` — register/login, JwtStrategy, JwtAuthGuard, RolesGuard + @Roles('ADMIN')
-- `backend/src/rooms/` — CRUD ห้อง (Admin) + search ห้องว่างตามช่วงเวลา
+- `backend/prisma/schema.prisma` — models: User, Room, Booking, BookingParticipant (ยังไม่ได้ใช้จริง — เตรียมไว้เผื่อฟีเจอร์ Optional "เชิญผู้เข้าร่วม" ที่ตัดสินใจไม่ทำรอบนี้) + enums Role, BookingStatus, ParticipantStatus
+- `backend/src/auth/` — register/login/me, JwtStrategy, JwtAuthGuard, RolesGuard + @Roles('ADMIN')
+- `backend/src/users/` — GET/PATCH `/users/me` (แก้ชื่อ, เปลี่ยนรหัสผ่านต้องยืนยันรหัสเดิม)
+- `backend/src/rooms/` — CRUD ห้อง (Admin) + search ห้องว่างตามช่วงเวลา + `/rooms/schedule` (ตาราง timeline รายวัน)
 - `backend/src/bookings/` — จอง/แก้/ยกเลิก, **logic กันจองซ้อนอยู่ที่ `assertNoOverlap()`** (เงื่อนไข: startA < endB && endA > startB)
-- `frontend/app/` — page.js (ค้นหา), login, register, rooms/[id] (จอง), my-bookings, admin
-- `frontend/lib/api.js` — fetch wrapper, เก็บ JWT ใน localStorage
+- `frontend/src/app/` — page.tsx (ค้นหา+timeline), login, register, rooms/[id] (จอง), my-bookings, account, admin — ทุกหน้าเป็น Server Component ที่ดึงข้อมูลตรง ไม่มี useEffect+fetch
+- `frontend/src/lib/api/` — typed fetch layer: `apiFetch` (public), `authFetch` (แนบ Bearer จาก session อัตโนมัติ) + resource api ต่อ entity (`rooms.api.ts` ฯลฯ)
+- `frontend/src/lib/auth.ts` — next-auth v5 (Credentials → เรียก NestJS API), session ถือ accessToken **แทน localStorage เดิม**
+- `frontend/src/lib/actions/` — Server Actions (validate ด้วย zod) สำหรับทุก mutation (จอง/แก้ห้อง/เปลี่ยนรหัสผ่าน ฯลฯ)
+- `frontend/src/middleware.ts` — กัน route ที่ต้อง login + กัน `/admin` เฉพาะ role ADMIN
 - seed: `pnpm run seed` → admin@meetspace.dev / admin1234 + ห้องตัวอย่าง 5 ห้อง (seed ซ้ำได้ ไม่เพิ่มห้องซ้ำ)
 
 ## กติกาการทำงาน
@@ -45,10 +49,24 @@ Single Project ของ DevNest School (นักเรียน: โอฬา�
 ## วิธีรัน
 ```bash
 # ต้องมี PostgreSQL (db ชื่อ meetspace) รันอยู่ก่อน — ใช้ pnpm (ห้าม npm/yarn จะได้ไม่มี lockfile ซ้อน)
-cd backend && cp .env.example .env && pnpm install && pnpm exec prisma migrate dev && pnpm run seed && pnpm run start:dev
-cd frontend && cp .env.local.example .env.local && pnpm install && pnpm run dev
+cd backend && pnpm install && pnpm exec prisma migrate dev && pnpm run seed && pnpm run start:dev
+cd frontend && pnpm install && pnpm run dev
+# ทั้งสองฝั่งมีไฟล์ .env อยู่แล้ว (ไม่มี .example) แก้ค่าตรงในไฟล์นั้นได้เลย
 ```
 
 ## หมายเหตุ toolchain
-- Frontend ใช้ Tailwind CSS v4 แบบ CSS-first: ตั้งธีมใน `@theme` ที่ `frontend/app/globals.css` **ไม่มี tailwind.config.js**
+- Frontend ใช้ Tailwind CSS v4 แบบ CSS-first: ตั้งธีมใน `@theme` ที่ `frontend/src/app/globals.css` **ไม่มี tailwind.config.js**
 - `backend/pnpm-workspace.yaml` มี `allowBuilds` อนุญาต postinstall ของ bcrypt/prisma (pnpm บล็อกเป็นค่าเริ่มต้น)
+
+## Package ที่ต้องเพิ่มถ้าจะทำ feature เหล่านี้ (ยังไม่ได้ทำ — กันลืมว่าต้องลง lib อะไร)
+| อยากทำ feature นี้ | ต้องเพิ่ม package | เพิ่มฝั่งไหน |
+|---|---|---|
+| อัปโหลดรูปโปรไฟล์/รูปห้อง | `multer` (Nest มี built-in ผ่าน `@nestjs/platform-express` อยู่แล้ว) + ถ้าเก็บบน cloud ใช้ `cloudinary` หรือ `@aws-sdk/client-s3` | backend |
+| ส่งอีเมลแจ้งเตือนการจอง | `nodemailer` หรือ `@nestjs-modules/mailer` | backend |
+| แสดงกราฟ/สถิติในหน้า admin | `recharts` หรือ `chart.js` | frontend |
+| Realtime (เห็นคนอื่นจองห้องแบบสด ไม่ต้อง refresh) | `socket.io` (backend) + `socket.io-client` (frontend) | ทั้งคู่ |
+| เขียน automated test | `jest`, `@nestjs/testing` | backend |
+| Rate limiting กันสแปม | `@nestjs/throttler` | backend |
+| Animation ในหน้าเว็บ | `framer-motion` | frontend |
+| Icon แทน emoji | `lucide-react` | frontend |
+| Validate env vars ฝั่ง backend ให้เข้มแบบ zod | `zod` (frontend มีอยู่แล้ว, backend ยังไม่มี) | backend |

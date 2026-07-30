@@ -6,16 +6,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createBookingAction } from '@/lib/actions/booking.action';
 import { z } from 'zod';
-
-const input = 'w-full rounded-lg border border-line bg-white p-2.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue';
-const label = 'mb-1 block text-sm font-medium text-ink';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 // ฟอร์มฝั่ง client รับ title/date/time แล้วประกอบเป็น ISO ส่งเข้า server action
 const formSchema = z.object({
-  title: z.string().min(1, 'กรุณากรอกหัวข้อการประชุม'),
-  date: z.string().min(1, 'กรุณาเลือกวันที่'),
-  startTime: z.string().min(1, 'กรุณาเลือกเวลาเริ่ม'),
-  endTime: z.string().min(1, 'กรุณาเลือกเวลาสิ้นสุด'),
+  title: z.string().min(1, 'Please enter a meeting title'),
+  date: z.string().min(1, 'Please select a date'),
+  startTime: z.string().min(1, 'Please select a start time'),
+  endTime: z.string().min(1, 'Please select an end time'),
 });
 type FormInput = z.infer<typeof formSchema>;
 
@@ -45,7 +45,7 @@ export default function BookingForm({ roomId, defaults }: Props) {
         setMsg({ error: res.message, ok: '' });
         return;
       }
-      setMsg({ error: '', ok: res.message ?? 'จองสำเร็จ!' });
+      setMsg({ error: '', ok: res.message ?? 'Booking successful!' });
       reset({ title: '', date: v.date, startTime: '', endTime: '' });
       router.refresh(); // ให้ตารางของห้อง (RSC) อัปเดต
     });
@@ -53,43 +53,39 @@ export default function BookingForm({ roomId, defaults }: Props) {
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>
-      <div>
-        <span className={label}>หัวข้อการประชุม</span>
-        <input className={input} placeholder="Sprint Planning Q3" {...register('title')} />
-        {errors.title && <p className="mt-1 text-sm text-danger">{errors.title.message}</p>}
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="title">Meeting Title</Label>
+        <Input id="title" className="h-10" placeholder="Sprint Planning Q3" {...register('title')} />
+        {errors.title && <p className="text-sm text-danger">{errors.title.message}</p>}
       </div>
-      <div>
-        <span className={label}>วันที่</span>
-        <input className={input} type="date" {...register('date')} />
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="date">Date</Label>
+        <Input id="date" className="h-10" type="date" {...register('date')} />
       </div>
       <div className="flex flex-wrap gap-3">
-        <div className="min-w-28 flex-1">
-          <span className={label}>เวลาเริ่ม</span>
-          <input className={input} type="time" {...register('startTime')} />
+        <div className="flex min-w-28 flex-1 flex-col gap-1.5">
+          <Label htmlFor="startTime">Start Time</Label>
+          <Input id="startTime" className="h-10" type="time" {...register('startTime')} />
         </div>
-        <div className="min-w-28 flex-1">
-          <span className={label}>เวลาสิ้นสุด</span>
-          <input className={input} type="time" {...register('endTime')} />
+        <div className="flex min-w-28 flex-1 flex-col gap-1.5">
+          <Label htmlFor="endTime">End Time</Label>
+          <Input id="endTime" className="h-10" type="time" {...register('endTime')} />
         </div>
       </div>
       {msg.error && (
         <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm">
-          <p className="font-semibold text-rose-700">⚠️ จองไม่ได้</p>
+          <p className="font-semibold text-rose-700">⚠️ Booking failed</p>
           <p className="mt-0.5 text-rose-600">{msg.error}</p>
         </div>
       )}
       {msg.ok && (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium text-emerald-700">
-          ✓ {msg.ok} <Link className="underline hover:text-emerald-900" href="/my-bookings">ดูการจองของฉัน →</Link>
+          ✓ {msg.ok} <Link className="underline hover:text-emerald-900" href="/my-bookings">View my bookings →</Link>
         </div>
       )}
-      <button
-        className="cursor-pointer rounded-lg bg-blue px-4 py-2.5 font-medium text-white hover:bg-blue-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue disabled:opacity-60"
-        type="submit"
-        disabled={pending}
-      >
-        {pending ? 'กำลังจอง...' : 'ยืนยันการจอง'}
-      </button>
+      <Button type="submit" className="h-10 w-full" disabled={pending}>
+        {pending ? 'Booking...' : 'Confirm Booking'}
+      </Button>
     </form>
   );
 }

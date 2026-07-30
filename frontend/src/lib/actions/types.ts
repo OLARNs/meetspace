@@ -6,5 +6,5 @@ export type ActionResult =
 // ดึงข้อความ error แรกจาก zod มาโชว์
 import type { z } from 'zod';
 export function firstZodError(error: z.ZodError): string {
-  return error.issues[0]?.message ?? 'ข้อมูลไม่ถูกต้อง';
+  return error.issues[0]?.message ?? 'Invalid data';
 }
