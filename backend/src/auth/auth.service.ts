@@ -2,11 +2,15 @@ import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { createHash, timingSafeEqual } from 'crypto';
+import { OAuth2Client } from 'google-auth-library';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
+  // ตัว verify id_token ของ Google (ตรวจลายเซ็นของ Google เอง ปลอมไม่ได้)
+  private googleClient = new OAuth2Client();
+
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
   async register(dto: RegisterDto) {
@@ -21,8 +25,45 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (!user || !(await bcrypt.compare(dto.password, user.password))) {
+    // !user.password = บัญชี Google ล้วน (ไม่มีรหัสผ่าน) → ตอบ 401 ปกติ ไม่ให้ bcrypt.compare(x, null) throw เป็น 500
+    if (!user || !user.password || !(await bcrypt.compare(dto.password, user.password))) {
       throw new UnauthorizedException('Invalid email or password');
+    }
+    return this.issueTokens(user);
+  }
+
+  // login ด้วย Google: frontend ส่ง id_token มา → verify กับ Google → find-or-create → ออก token ชุดเดิม
+  async googleLogin(idToken: string) {
+    let email: string | undefined;
+    let name: string | undefined;
+    let googleId: string | undefined;
+    let emailVerified: boolean | undefined;
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID, // กันเอา token ของแอปอื่นมาใช้
+      });
+      const payload = ticket.getPayload();
+      email = payload?.email;
+      name = payload?.name;
+      googleId = payload?.sub;
+      emailVerified = payload?.email_verified;
+    } catch {
+      throw new UnauthorizedException('Invalid Google token');
+    }
+    if (!email || !googleId) throw new UnauthorizedException('Invalid Google token');
+    // กัน account takeover: ถ้า Google ยังไม่ยืนยันอีเมล ห้ามเอามาผูก/สร้างบัญชี
+    // (ไม่งั้นคนที่คุม Google Workspace domain อาจปลอมอีเมลของเหยื่อมา link บัญชีได้)
+    if (!emailVerified) throw new UnauthorizedException('Google email is not verified');
+
+    // หาโดย googleId ก่อน แล้วค่อย email (เผื่อเคยสมัคร email/password ไว้ → ผูกเป็นบัญชีเดียวกัน)
+    let user =
+      (await this.prisma.user.findUnique({ where: { googleId } })) ??
+      (await this.prisma.user.findUnique({ where: { email } }));
+    if (!user) {
+      user = await this.prisma.user.create({ data: { email, name: name ?? email, googleId } });
+    } else if (!user.googleId) {
+      user = await this.prisma.user.update({ where: { id: user.id }, data: { googleId } });
     }
     return this.issueTokens(user);
   }

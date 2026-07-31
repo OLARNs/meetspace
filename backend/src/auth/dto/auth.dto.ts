@@ -14,3 +14,7 @@ export class LoginDto {
 export class RefreshDto {
   @IsString() refreshToken: string;
 }
+
+export class GoogleAuthDto {
+  @IsString() idToken: string;
+}

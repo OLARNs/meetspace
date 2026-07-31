@@ -17,7 +17,13 @@ export default async function AccountPage() {
         </div>
         <div className="self-start rounded-xl border border-line bg-white p-5 shadow-sm">
           <h3 className="mb-4 text-lg font-bold text-navy">Change Password</h3>
-          <PasswordForm />
+          {me.hasPassword ? (
+            <PasswordForm />
+          ) : (
+            <p className="text-sm text-muted">
+              You signed in with Google, so there&apos;s no password to change.
+            </p>
+          )}
         </div>
       </div>
     </>

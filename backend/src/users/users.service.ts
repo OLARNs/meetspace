@@ -11,9 +11,14 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async me(userId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: SAFE_SELECT });
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { ...SAFE_SELECT, password: true },
+    });
     if (!user) throw new NotFoundException('User not found');
-    return user;
+    // ไม่ส่ง password ออกไป — ส่งแค่ธง hasPassword ให้ frontend ซ่อนฟอร์มเปลี่ยนรหัสของ Google user
+    const { password, ...rest } = user;
+    return { ...rest, hasPassword: password !== null };
   }
 
   async updateMe(userId: string, dto: UpdateMeDto) {
@@ -28,6 +33,10 @@ export class UsersService {
       }
       const user = await this.prisma.user.findUnique({ where: { id: userId } });
       if (!user) throw new NotFoundException('User not found');
+      // บัญชี Google ล้วน (ไม่มีรหัสผ่าน) เปลี่ยนรหัสไม่ได้
+      if (!user.password) {
+        throw new BadRequestException('This account uses Google sign-in and has no password to change');
+      }
       const match = await bcrypt.compare(dto.currentPassword, user.password);
       if (!match) throw new UnauthorizedException('Current password is incorrect');
       data.password = await bcrypt.hash(dto.newPassword, 10);

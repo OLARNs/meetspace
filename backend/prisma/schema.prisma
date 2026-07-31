@@ -27,13 +27,16 @@ model User {
   id             String               @id @default(uuid())
   name           String
   email          String               @unique
-  password       String
+  // nullable: ผู้ใช้ที่ login ด้วย Google จะไม่มีรหัสผ่าน
+  password       String?
   role           Role                 @default(USER)
   bookings       Booking[]
   participations BookingParticipant[]
   createdAt      DateTime             @default(now())
   // sha256 ของ refresh token ที่ยัง active (null = ยังไม่ login / logout แล้ว)
   refreshTokenHash String?
+  // ผูกกับบัญชี Google (sub) — null = สมัครแบบ email/password ปกติ
+  googleId       String?              @unique
 }
 
 model Room {

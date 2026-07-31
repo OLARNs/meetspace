@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 import { AuthApi } from '@/lib/api/auth.api';
 import { ApiError } from '@/lib/api/api-error';
 import type { Role } from '@/lib/api/api.type';
@@ -14,8 +15,10 @@ const ACCESS_TOKEN_TTL_MS = 14 * 60 * 1000;
 export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   // cookie ของ next-auth อยู่ได้ 1 ปี + ต่ออายุเองทุกครั้งที่เข้าเว็บ → ให้ยาวพอกับ refresh ที่ไม่หมดอายุ
   session: { strategy: 'jwt', maxAge: 60 * 60 * 24 * 365 },
+  trustHost: true, // dev: ให้ next-auth เชื่อ host ตอนสร้าง callback URL ของ OAuth (Google)
   pages: { signIn: '/login' },
   providers: [
+    Google, // อ่าน AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET จาก env อัตโนมัติ
     Credentials({
       credentials: { email: {}, password: {} },
       async authorize(input) {
@@ -35,7 +38,24 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   ],
   callbacks: {
     // ย้ายข้อมูลจาก user (ตอน login) เข้า token; รองรับ unstable_update ตอนแก้ชื่อ; ต่ออายุ access token
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, account, trigger, session }) {
+      // 0) Google login: แลก id_token ของ Google กับ backend เอา token ของเรา (ทำครั้งเดียวหลัง OAuth สำเร็จ)
+      if (account?.provider === 'google') {
+        try {
+          const res = await AuthApi.googleAuth(account.id_token as string);
+          token.sub = res.user.id;
+          token.name = res.user.name;
+          token.email = res.user.email;
+          token.role = res.user.role;
+          token.accessToken = res.accessToken;
+          token.refreshToken = res.refreshToken;
+          token.accessTokenExpires = Date.now() + ACCESS_TOKEN_TTL_MS;
+          token.error = undefined;
+        } catch {
+          token.error = 'RefreshAccessTokenError';
+        }
+        return token;
+      }
       // 1) ตอน login: เก็บ access + refresh + เวลาที่ควรต่ออายุ
       if (user) {
         token.sub = user.id;

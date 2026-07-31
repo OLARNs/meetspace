@@ -14,7 +14,8 @@ export type AuthResponse = {
   user: AuthUser;
 };
 
-export type Me = AuthUser & { createdAt: string };
+// hasPassword: false = บัญชี Google ล้วน (ไม่มีรหัสผ่าน) → ซ่อนฟอร์มเปลี่ยนรหัส
+export type Me = AuthUser & { createdAt: string; hasPassword: boolean };
 
 export type Room = {
   id: string;

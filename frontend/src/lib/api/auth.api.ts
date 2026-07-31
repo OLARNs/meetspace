@@ -26,4 +26,11 @@ export const AuthApi = {
   logout(token: string) {
     return apiFetch<void>('/auth/logout', { method: 'POST', token });
   },
+  // แลก id_token ของ Google กับ backend เอา access + refresh token ของเรา
+  googleAuth(idToken: string) {
+    return apiFetch<AuthResponse>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+    });
+  },
 };

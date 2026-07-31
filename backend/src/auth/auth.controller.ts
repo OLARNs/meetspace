@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
 import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
 import { AuthService } from "./auth.service";
-import { RegisterDto, LoginDto, RefreshDto } from "./dto/auth.dto";
+import { RegisterDto, LoginDto, RefreshDto, GoogleAuthDto } from "./dto/auth.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 
 // throttle ทุก endpoint ของ auth กัน brute-force (login/register เข้ม, refresh ผ่อนกว่า)
@@ -29,6 +29,13 @@ export class AuthController {
   @Post("refresh")
   refresh(@Body() dto: RefreshDto) {
     return this.auth.refresh(dto.refreshToken);
+  }
+
+  // login ด้วย Google — frontend (next-auth) ส่ง id_token ของ Google มาแลก token ของเรา
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Post("google")
+  google(@Body() dto: GoogleAuthDto) {
+    return this.auth.googleLogin(dto.idToken);
   }
 
   // ต้องมี access token ที่ยัง valid ถึงจะ logout ได้ (รู้ว่า userId ไหน)

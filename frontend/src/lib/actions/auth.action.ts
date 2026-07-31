@@ -19,6 +19,11 @@ export async function loginAction(input: LoginInput): Promise<ActionResult> {
   return { success: true };
 }
 
+// เข้าสู่ระบบด้วย Google — signIn('google') จะเด้งไป Google แล้วกลับมาที่ /api/auth/callback/google
+export async function googleLoginAction(): Promise<void> {
+  await signIn('google', { redirectTo: '/' });
+}
+
 export async function logoutAction(): Promise<void> {
   // ล้าง refreshTokenHash ฝั่ง backend ก่อน (best-effort — token หมด/ล้มก็ยัง signOut ต่อได้)
   const session = await auth();
