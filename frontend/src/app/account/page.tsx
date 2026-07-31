@@ -13,7 +13,7 @@ export default async function AccountPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="self-start rounded-xl border border-line bg-white p-5 shadow-sm">
           <h3 className="mb-4 text-lg font-bold text-navy">Profile</h3>
-          <ProfileForm defaultName={me.name} email={me.email} />
+          <ProfileForm defaultName={me.name} email={me.email} avatarUrl={me.avatarUrl} />
         </div>
         <div className="self-start rounded-xl border border-line bg-white p-5 shadow-sm">
           <h3 className="mb-4 text-lg font-bold text-navy">Change Password</h3>

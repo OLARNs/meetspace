@@ -19,6 +19,7 @@
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "cloudinary": "^2.10.0",
     "google-auth-library": "^10.9.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
     "@types/bcrypt": "^5.0.2",
+    "@types/multer": "^2.2.0",
     "@types/passport-jwt": "^4.0.1",
     "prisma": "^5.15.0",
     "ts-node": "^10.9.2",

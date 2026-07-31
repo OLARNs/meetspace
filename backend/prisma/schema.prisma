@@ -37,6 +37,8 @@ model User {
   refreshTokenHash String?
   // ผูกกับบัญชี Google (sub) — null = สมัครแบบ email/password ปกติ
   googleId       String?              @unique
+  // URL รูปโปรไฟล์ (เก็บบน Cloudinary) — null = ยังไม่มีรูป
+  avatarUrl      String?
 }
 
 model Room {

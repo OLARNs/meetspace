@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { v2 as cloudinary } from 'cloudinary';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateMeDto } from './dto/update-me.dto';
 
 // เลือกเฉพาะฟิลด์ที่ปลอดภัยจะส่งกลับให้ frontend — ไม่มี password ปนมาเด็ดขาด
-const SAFE_SELECT = { id: true, name: true, email: true, role: true, createdAt: true };
+const SAFE_SELECT = { id: true, name: true, email: true, role: true, createdAt: true, avatarUrl: true };
 
 @Injectable()
 export class UsersService {
@@ -46,5 +47,18 @@ export class UsersService {
 
     const updated = await this.prisma.user.update({ where: { id: userId }, data, select: SAFE_SELECT });
     return updated;
+  }
+
+  // อัปโหลดรูปโปรไฟล์ขึ้น Cloudinary แล้วเก็บ URL — cloudinary อ่าน CLOUDINARY_URL จาก env อัตโนมัติ
+  async setAvatar(userId: string, file: Express.Multer.File) {
+    const url = await new Promise<string>((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          { folder: 'meetspace/avatars', resource_type: 'image' },
+          (err, result) => (err || !result ? reject(err ?? new Error('Upload failed')) : resolve(result.secure_url)),
+        )
+        .end(file.buffer);
+    });
+    return this.prisma.user.update({ where: { id: userId }, data: { avatarUrl: url }, select: SAFE_SELECT });
   }
 }

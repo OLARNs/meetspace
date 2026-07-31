@@ -26,6 +26,21 @@ export async function updateNameAction(input: UpdateNameInput): Promise<ActionRe
   return { success: true, message: 'Name saved' };
 }
 
+export async function uploadAvatarAction(formData: FormData): Promise<ActionResult> {
+  const file = formData.get('file');
+  if (!(file instanceof File) || file.size === 0) {
+    return { success: false, message: 'Please choose an image' };
+  }
+  try {
+    await UsersApi.uploadAvatar(formData);
+  } catch (error) {
+    if (error instanceof ApiError) return { success: false, message: error.message };
+    throw error;
+  }
+  revalidatePath('/account');
+  return { success: true, message: 'Profile photo updated' };
+}
+
 export async function changePasswordAction(input: ChangePasswordInput): Promise<ActionResult> {
   const parsed = changePasswordSchema.safeParse(input);
   if (!parsed.success) return { success: false, message: firstZodError(parsed.error) };

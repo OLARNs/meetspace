@@ -6,7 +6,7 @@ import type { Role } from '@/lib/api/api.type';
 import { logoutAction } from '@/lib/actions/auth.action';
 import { Button } from '@/components/ui/button';
 
-type Props = { user: { name: string; role: Role } | null };
+type Props = { user: { name: string; role: Role; avatarUrl: string | null } | null };
 
 // ลิงก์เมนู: หน้าปัจจุบันเป็น pill สว่าง ตัวอื่นสีจาง
 const navLink = (active: boolean) =>
@@ -23,21 +23,42 @@ export default function NavClient({ user }: Props) {
       </Link>
       <Link className={navLink(pathname === '/')} href="/">Search Rooms</Link>
       {user && <Link className={navLink(pathname === '/my-bookings')} href="/my-bookings">My Bookings</Link>}
-      {user && <Link className={navLink(pathname === '/account')} href="/account">My Account</Link>}
       <span className="mr-auto" />
       {/* เมนูผู้ดูแลระบบเห็นเฉพาะ role ADMIN */}
       {user?.role === 'ADMIN' && <Link className={navLink(pathname === '/admin')} href="/admin">Admin</Link>}
       {user ? (
-        <form action={logoutAction}>
-          <Button
-            type="submit"
-            variant="outline"
-            size="sm"
-            className="border-white/25 bg-transparent text-slate-200 hover:bg-white/10 hover:text-white"
+        <div className="flex items-center gap-2">
+          {/* รูป + ชื่อ = ปุ่มเดียว คลิกไปหน้า account (แบบ Facebook) */}
+          <Link
+            href="/account"
+            title="My Account"
+            className="flex items-center gap-2 rounded-full py-1 pr-3 pl-1 transition-colors hover:bg-white/10"
           >
-            Sign out · {user.name}
-          </Button>
-        </form>
+            {user.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.avatarUrl}
+                alt={user.name}
+                className="h-8 w-8 rounded-full object-cover ring-1 ring-white/25"
+              />
+            ) : (
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-sm font-semibold text-white ring-1 ring-white/25">
+                {user.name.trim().charAt(0).toUpperCase() || '?'}
+              </span>
+            )}
+            <span className="max-w-40 truncate text-sm font-medium text-white">{user.name}</span>
+          </Link>
+          <form action={logoutAction}>
+            <Button
+              type="submit"
+              variant="outline"
+              size="sm"
+              className="border-white/25 bg-transparent text-slate-200 hover:bg-white/10 hover:text-white"
+            >
+              Sign out
+            </Button>
+          </form>
+        </div>
       ) : (
         <Button asChild className="h-9 hover:bg-blue-dark">
           <Link href="/login">Sign In</Link>
