@@ -17,7 +17,7 @@ export class UsersService {
   }
 
   async updateMe(userId: string, dto: UpdateMeDto) {
-    const data: { name?: string; password?: string } = {};
+    const data: { name?: string; password?: string; refreshTokenHash?: null } = {};
 
     if (dto.name) data.name = dto.name;
 
@@ -31,6 +31,8 @@ export class UsersService {
       const match = await bcrypt.compare(dto.currentPassword, user.password);
       if (!match) throw new UnauthorizedException('Current password is incorrect');
       data.password = await bcrypt.hash(dto.newPassword, 10);
+      // เปลี่ยนรหัสแล้วเพิกถอน session เดิมทุกเครื่อง (เผื่อรหัสถูกขโมย) — refresh ใบเก่าใช้ไม่ได้อีก
+      data.refreshTokenHash = null;
     }
 
     const updated = await this.prisma.user.update({ where: { id: userId }, data, select: SAFE_SELECT });

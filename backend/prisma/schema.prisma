@@ -32,6 +32,8 @@ model User {
   bookings       Booking[]
   participations BookingParticipant[]
   createdAt      DateTime             @default(now())
+  // sha256 ของ refresh token ที่ยัง active (null = ยังไม่ login / logout แล้ว)
+  refreshTokenHash String?
 }
 
 model Room {

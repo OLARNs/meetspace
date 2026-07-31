@@ -7,6 +7,7 @@ declare module 'next-auth' {
     id: string;
     role: Role;
     accessToken: string;
+    refreshToken: string;
   }
   interface Session {
     user: {
@@ -14,6 +15,8 @@ declare module 'next-auth' {
       role: Role;
       accessToken: string;
     } & DefaultSession['user'];
+    // ตั้งเมื่อ refresh token ใช้ไม่ได้แล้ว → authFetch เห็นแล้วเด้งไป login ใหม่
+    error?: 'RefreshAccessTokenError';
   }
 }
 
@@ -21,5 +24,8 @@ declare module 'next-auth/jwt' {
   interface JWT {
     role: Role;
     accessToken: string;
+    refreshToken: string;
+    accessTokenExpires: number; // เวลา (ms) ที่ควรต่ออายุ access token
+    error?: 'RefreshAccessTokenError';
   }
 }

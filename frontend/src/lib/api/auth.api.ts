@@ -15,4 +15,15 @@ export const AuthApi = {
       body: JSON.stringify(input),
     });
   },
+  // ขอ access token ใบใหม่ด้วย refresh token — public (access หมดแล้ว แนบ Bearer ไม่ได้)
+  refresh(refreshToken: string) {
+    return apiFetch<{ accessToken: string; refreshToken: string }>('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+  },
+  // ล้าง refreshTokenHash ฝั่ง backend — ต้องแนบ access token ที่ยัง valid
+  logout(token: string) {
+    return apiFetch<void>('/auth/logout', { method: 'POST', token });
+  },
 };

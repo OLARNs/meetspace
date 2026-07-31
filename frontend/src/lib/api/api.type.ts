@@ -10,6 +10,7 @@ export type AuthUser = {
 
 export type AuthResponse = {
   accessToken: string;
+  refreshToken: string;
   user: AuthUser;
 };
 
