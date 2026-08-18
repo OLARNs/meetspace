@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import RegisterForm from '@/components/features/auth/RegisterForm';
+import GoogleSignInButton from '@/components/features/auth/GoogleSignInButton';
 
 export default function RegisterPage() {
   return (
@@ -12,6 +13,10 @@ export default function RegisterPage() {
         <h1 className="text-center text-2xl font-bold text-navy">Sign Up</h1>
         <p className="mt-1 mb-6 text-center text-sm text-muted">Create an account to start booking meeting rooms</p>
         <RegisterForm />
+        <div className="my-5 flex items-center gap-3 text-xs text-muted">
+          <span className="h-px flex-1 bg-line" /> or <span className="h-px flex-1 bg-line" />
+        </div>
+        <GoogleSignInButton />
         <p className="mt-5 text-center text-sm">
           Already have an account? <Link className="font-semibold text-blue hover:underline" href="/login">Sign in</Link>
         </p>

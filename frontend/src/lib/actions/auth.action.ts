@@ -1,6 +1,6 @@
 'use server';
 import { AuthError } from 'next-auth';
-import { signIn, signOut } from '@/lib/auth';
+import { auth, signIn, signOut } from '@/lib/auth';
 import { AuthApi } from '@/lib/api/auth.api';
 import { ApiError } from '@/lib/api/api-error';
 import { loginSchema, registerSchema, type LoginInput, type RegisterInput } from '@/lib/schemas/auth.schema';
@@ -19,7 +19,22 @@ export async function loginAction(input: LoginInput): Promise<ActionResult> {
   return { success: true };
 }
 
+// เข้าสู่ระบบด้วย Google — signIn('google') จะเด้งไป Google แล้วกลับมาที่ /api/auth/callback/google
+export async function googleLoginAction(): Promise<void> {
+  await signIn('google', { redirectTo: '/' });
+}
+
 export async function logoutAction(): Promise<void> {
+  // ล้าง refreshTokenHash ฝั่ง backend ก่อน (best-effort — token หมด/ล้มก็ยัง signOut ต่อได้)
+  const session = await auth();
+  const token = session?.user?.accessToken;
+  if (token) {
+    try {
+      await AuthApi.logout(token);
+    } catch {
+      // เพิกเฉย: ถึง backend logout ไม่สำเร็จ ก็ยังต้องล้าง session ฝั่ง web
+    }
+  }
   await signOut({ redirectTo: '/login' });
 }
 

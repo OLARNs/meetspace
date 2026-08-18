@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import LoginForm from '@/components/features/auth/LoginForm';
+import GoogleSignInButton from '@/components/features/auth/GoogleSignInButton';
 
 export default function LoginPage({ searchParams }: { searchParams: { expired?: string } }) {
   const expired = searchParams.expired === '1';
@@ -17,6 +18,10 @@ export default function LoginPage({ searchParams }: { searchParams: { expired?: 
           </p>
         )}
         <LoginForm />
+        <div className="my-5 flex items-center gap-3 text-xs text-muted">
+          <span className="h-px flex-1 bg-line" /> or <span className="h-px flex-1 bg-line" />
+        </div>
+        <GoogleSignInButton />
         <p className="mt-5 text-center text-sm">
           Don&apos;t have an account? <Link className="font-semibold text-blue hover:underline" href="/register">Sign up</Link>
         </p>

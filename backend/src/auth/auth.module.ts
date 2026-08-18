@@ -10,7 +10,8 @@ import { JwtStrategy } from './jwt.strategy';
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
+      // ไม่ตั้ง default expiresIn ที่นี่ — ไม่งั้น refresh token จะติดค่านี้ไปด้วย
+      // access ตั้ง 15m ตอนเซ็น (signAccess), refresh ไม่ตั้งเลย = ไม่หมดอายุ
     }),
   ],
   controllers: [AuthController],
