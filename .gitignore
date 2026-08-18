@@ -10,3 +10,7 @@ dist/
 # ไฟล์ตั้งค่า/คำสั่งของ Claude Code — เก็บไว้ในเครื่องเท่านั้น ไม่ขึ้น GitHub
 .claude/
 CLAUDE.md
+
+# ไฟล์ตั้งค่า editor + ไฟล์ zip ที่ backup ไว้ในเครื่อง ไม่ต้องขึ้น GitHub
+.vscode/
+*.zip
